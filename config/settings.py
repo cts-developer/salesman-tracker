@@ -10,7 +10,7 @@ SECRET_KEY = 'django-insecure-salesman-tracker-dev-key-change-in-production-9x7k
 
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['200.97.166.186', 'localhost', '127.0.0.1']
 
 
 # Application definition
