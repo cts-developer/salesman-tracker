@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% block title %}{{ project.project_name }}{% endblock %}
+{% block crumb %}Project Visits{% endblock %}
+{% block page_title %}{{ project.project_name }}{% endblock %}
+{% block topbar_action %}<a href="{% url 'tracker:project_edit' project.pk %}" class="btn btn-st-outline">Edit</a>{% endblock %}
+
+{% block content %}
+<div class="row g-3">
+  <div class="col-lg-8">
+    <div class="st-card mb-3">
+      <div class="st-card-header">
+        <h3>Project Overview</h3>
+        {% if project.stage == "finalized" %}<span class="st-badge active">{{ project.get_stage_display }}</span>
+        {% elif project.stage == "lost" %}<span class="st-badge danger">{{ project.get_stage_display }}</span>
+        {% elif project.stage == "negotiation" %}<span class="st-badge pending">{{ project.get_stage_display }}</span>
+        {% else %}<span class="st-badge info">{{ project.get_stage_display }}</span>{% endif %}
+      </div>
+      <div class="st-card-body">
+        <div class="row g-3">
+          <div class="col-6 col-md-4"><div class="text-muted-st" style="font-size:0.75rem;">Type</div><strong>{{ project.get_project_type_display }}</strong></div>
+          <div class="col-6 col-md-4"><div class="text-muted-st" style="font-size:0.75rem;">Area</div><strong>{{ project.area.name|default:"—" }}</strong></div>
+          <div class="col-6 col-md-4"><div class="text-muted-st" style="font-size:0.75rem;">Expected Value</div><strong>₹{{ project.expected_business_value|intcomma }}</strong></div>
+          <div class="col-6 col-md-4"><div class="text-muted-st" style="font-size:0.75rem;">Visit Date</div><strong>{{ project.visit_date }}</strong></div>
+          <div class="col-6 col-md-4"><div class="text-muted-st" style="font-size:0.75rem;">Expected Closure</div><strong>{{ project.expected_closure_date|default:"—" }}</strong></div>
+          <div class="col-6 col-md-4"><div class="text-muted-st" style="font-size:0.75rem;">Logged By</div><strong>{{ project.salesman.get_full_name|default:project.salesman.username }}</strong></div>
+        </div>
+        {% if project.location %}<div class="st-divider"></div><div class="text-muted-st" style="font-size:0.75rem;">Location</div><p class="mb-0">{{ project.location }}</p>{% endif %}
+        {% if project.notes %}<div class="st-divider"></div><div class="text-muted-st" style="font-size:0.75rem;">Notes</div><p class="mb-0">{{ project.notes }}</p>{% endif %}
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-4">
+    <div class="st-card">
+      <div class="st-card-header"><h3>Contact</h3></div>
+      <div class="st-card-body">
+        <div class="mb-2"><div class="text-muted-st" style="font-size:0.75rem;">Contact Person</div><strong>{{ project.contact_person|default:"—" }}</strong></div>
+        <div class="mb-0"><div class="text-muted-st" style="font-size:0.75rem;">Phone</div><strong>{{ project.contact_phone|default:"—" }}</strong></div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

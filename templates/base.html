@@ -1,0 +1,157 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}Dashboard{% endblock %} · Salesman Tracker</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="{% static 'css/style.css' %}" rel="stylesheet">
+{% block extra_css %}{% endblock %}
+</head>
+<body>
+
+<div class="st-app">
+
+  <div class="st-mobile-overlay" id="stOverlay"></div>
+
+  <!-- Sidebar -->
+  <aside class="st-sidebar" id="stSidebar">
+    <div class="st-sidebar-brand">
+      <div class="st-mark">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 21s7-6.1 7-11.5A7 7 0 0 0 5 9.5C5 14.9 12 21 12 21z" stroke="#0f2a4a" stroke-width="1.8" stroke-linejoin="round"/>
+          <circle cx="12" cy="9.5" r="2.4" fill="#0f2a4a"/>
+        </svg>
+      </div>
+      <div>
+        <div class="st-brand-name">Salesman Tracker</div>
+        <div class="st-brand-sub">Field Sales Console</div>
+      </div>
+    </div>
+
+    <nav class="st-nav">
+      <div class="st-nav-section-label">Overview</div>
+      <a href="{% url 'tracker:dashboard' %}" class="st-nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
+        Dashboard
+      </a>
+
+      <div class="st-nav-section-label">Field Tracking</div>
+      <a href="{% url 'tracker:check_in' %}" class="st-nav-link {% if request.resolver_match.url_name == 'check_in' or request.resolver_match.url_name == 'visit_active' %}active{% endif %}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 21s7-6.1 7-11.5A7 7 0 0 0 5 9.5C5 14.9 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.4"/></svg>
+        Check-in / Check-out
+      </a>
+      <a href="{% url 'tracker:visit_list' %}" class="st-nav-link {% if request.resolver_match.url_name == 'visit_list' or request.resolver_match.url_name == 'visit_detail' %}active{% endif %}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg>
+        Visit &amp; Travel History
+      </a>
+
+      <div class="st-nav-section-label">Sales Data</div>
+      <a href="{% url 'tracker:dealer_list' %}" class="st-nav-link {% if 'dealer' in request.resolver_match.url_name %}active{% endif %}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="7" width="18" height="13" rx="1.5"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+        Dealers & Counters
+      </a>
+      <a href="{% url 'tracker:awareness_list' %}" class="st-nav-link {% if 'awareness' in request.resolver_match.url_name %}active{% endif %}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 9h8M8 13h5"/></svg>
+        Product Awareness
+      </a>
+      <a href="{% url 'tracker:price_list' %}" class="st-nav-link {% if 'price' in request.resolver_match.url_name %}active{% endif %}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 12h18M3 6h18M3 18h12"/></svg>
+        Price Comparison
+      </a>
+      <a href="{% url 'tracker:turnover_list' %}" class="st-nav-link {% if 'turnover' in request.resolver_match.url_name %}active{% endif %}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 17l5-5 4 4 8-8"/><path d="M14 8h6v6"/></svg>
+        Turnover
+      </a>
+      <a href="{% url 'tracker:project_list' %}" class="st-nav-link {% if 'project' in request.resolver_match.url_name %}active{% endif %}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 21h18"/><path d="M5 21V9l5-4 5 4v12"/><path d="M14 21v-7h4v7"/></svg>
+        Project Visits
+      </a>
+
+      {% if is_admin_user or is_manager_user %}
+      <div class="st-nav-section-label">Management</div>
+      <a href="{% url 'tracker:area_report' %}" class="st-nav-link {% if request.resolver_match.url_name == 'area_report' %}active{% endif %}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 19V9M11 19V5M18 19v-7"/></svg>
+        Area Performance
+      </a>
+      <a href="{% url 'tracker:area_list' %}" class="st-nav-link {% if request.resolver_match.url_name == 'area_list' or request.resolver_match.url_name == 'area_form' %}active{% endif %}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18 14 14 0 0 1 0-18z"/></svg>
+        Areas
+      </a>
+      <a href="{% url 'accounts:user_list' %}" class="st-nav-link {% if 'user' in request.resolver_match.url_name %}active{% endif %}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="8" r="3.2"/><path d="M2.5 20c.7-3.6 3.4-6 6.5-6s5.8 2.4 6.5 6"/><circle cx="17.5" cy="9" r="2.4"/><path d="M15.7 13.2c2.4.3 4.3 2.3 4.8 5.3"/></svg>
+        {% if is_owner_user %}Manage Users{% else %}My Team{% endif %}
+      </a>
+      <a href="{% url 'tracker:catalogue' %}" class="st-nav-link {% if request.resolver_match.url_name == 'catalogue' or request.resolver_match.url_name == 'brand_form' or request.resolver_match.url_name == 'product_form' %}active{% endif %}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20.5 8.5 12 4 3.5 8.5 12 13l8.5-4.5z"/><path d="M3.5 8.5V16L12 20.5 20.5 16V8.5"/></svg>
+        Brand &amp; Product Catalogue
+      </a>
+      {% endif %}
+    </nav>
+
+    <div class="st-sidebar-footer">
+      <div class="st-user-chip">
+        <div class="st-avatar">
+          {% if user.profile_photo %}<img src="{{ user.profile_photo.url }}" alt="">{% else %}{{ user.first_name|first|default:user.username|first|upper }}{% endif %}
+        </div>
+        <div>
+          <div class="st-uname">{{ user.get_full_name|default:user.username }}</div>
+          <div class="st-urole">{{ user.get_role_display }}</div>
+        </div>
+      </div>
+      <form action="{% url 'accounts:logout' %}" method="post" class="mt-3">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-st-outline w-100 btn-sm-st" style="background:rgba(255,255,255,0.04); border-color:rgba(255,255,255,0.16); color:#cdd9e8;">
+          Sign out
+        </button>
+      </form>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <div class="st-main">
+    <header class="st-topbar">
+      <div class="d-flex align-items-center gap-3">
+        <button class="st-burger" id="stBurger" aria-label="Toggle menu">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+        </button>
+        <div>
+          <div class="st-crumb">{% block crumb %}Salesman Tracker{% endblock %}</div>
+          <h1>{% block page_title %}Dashboard{% endblock %}</h1>
+        </div>
+      </div>
+      <div class="d-flex align-items-center gap-2">
+        <a href="{% url 'tracker:notification_list' %}" class="btn btn-st-outline btn-sm-st position-relative" style="padding:0.45rem 0.6rem;" title="Notifications">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+          {% if unread_notification_count %}
+          <span class="badge rounded-pill bg-danger" style="position:absolute; top:-4px; right:-4px; font-size:0.6rem;">{{ unread_notification_count }}</span>
+          {% endif %}
+        </a>
+        {% block topbar_action %}{% endblock %}
+      </div>
+    </header>
+
+    <main class="st-content">
+      {% if messages %}
+        {% for message in messages %}
+          <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-{{ message.tags }}{% endif %} d-flex align-items-center" data-auto-dismiss role="alert">
+            {{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
+
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="{% static 'js/app.js' %}"></script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

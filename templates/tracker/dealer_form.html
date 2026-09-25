@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block crumb %}Dealers & Counters{% endblock %}
+{% block page_title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+    <div class="st-card">
+      <div class="st-card-body">
+        <form method="post">
+          {% csrf_token %}
+          <div class="row g-3">
+            <div class="col-md-6"><label class="st-form-label">Dealer / Counter Name *</label>{{ form.name }}</div>
+            <div class="col-md-6"><label class="st-form-label">Type</label>{{ form.counter_type }}</div>
+            <div class="col-md-6"><label class="st-form-label">Owner Name</label>{{ form.owner_name }}</div>
+            <div class="col-md-6"><label class="st-form-label">Contact Person</label>{{ form.contact_person }}</div>
+            <div class="col-md-6"><label class="st-form-label">Phone</label>{{ form.phone }}</div>
+            <div class="col-md-6"><label class="st-form-label">Email</label>{{ form.email }}</div>
+            <div class="col-md-6"><label class="st-form-label">Area</label>{{ form.area }}</div>
+            <div class="col-md-6"><label class="st-form-label">GST Number</label>{{ form.gst_number }}</div>
+            <div class="col-12"><label class="st-form-label">Address</label>{{ form.address }}</div>
+
+            <div class="col-12">
+              <label class="st-form-label">GPS Location</label>
+              <div class="d-flex align-items-center gap-2 flex-wrap mb-2">
+                <button type="button" class="btn btn-st-outline btn-sm-st" onclick="stCaptureLocation('id_latitude','id_longitude','locStatusDealer')">Capture Current Location</button>
+                <span id="locStatusDealer" class="text-muted-st" style="font-size:0.82rem;"></span>
+              </div>
+              <div class="row g-2">
+                <div class="col-6">{{ form.latitude }}</div>
+                <div class="col-6">{{ form.longitude }}</div>
+              </div>
+            </div>
+
+            <div class="col-md-6"><label class="st-form-label">Brands Dealt</label>{{ form.brands_dealt }}</div>
+            <div class="col-md-6"><label class="st-form-label">Products Dealt</label>{{ form.products_dealt }}</div>
+            <div class="col-12"><label class="st-form-label">Assigned Salesmen</label>{{ form.assigned_salesmen }}</div>
+            <div class="col-12 form-check ms-1">{{ form.is_active }} <label class="form-check-label st-form-label">Active</label></div>
+          </div>
+          <button type="submit" class="btn btn-st-primary mt-4">Save Dealer</button>
+          <a href="{% url 'tracker:dealer_list' %}" class="btn btn-st-outline mt-4">Cancel</a>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

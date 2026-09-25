@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Price & Discount Comparison{% endblock %}
+{% block crumb %}Sales Data{% endblock %}
+{% block page_title %}Price & Discount Comparison{% endblock %}
+{% block topbar_action %}<a href="{% url 'tracker:price_create' %}" class="btn btn-st-accent">+ Add Comparison</a>{% endblock %}
+
+{% block content %}
+<div class="st-card">
+  {% if page_obj %}
+  <div class="st-table-wrap">
+    <table class="table-st mb-0">
+      <thead><tr><th>Dealer / Counter</th><th>Our Product</th><th>Our Price</th><th>Our Disc.</th><th>Competitor Product</th><th>Their Price</th><th>Their Disc.</th><th>Effective Difference</th></tr></thead>
+      <tbody>
+        {% for p in page_obj %}
+        <tr>
+          <td class="st-cell-title">{{ p.dealer.name }}</td>
+          <td>{{ p.our_product.name }}</td>
+          <td>₹{{ p.our_price }}</td>
+          <td>{{ p.our_discount_percent }}%</td>
+          <td>{{ p.competitor_product|default:"—" }}</td>
+          <td>{% if p.competitor_price %}₹{{ p.competitor_price }}{% else %}—{% endif %}</td>
+          <td>{{ p.competitor_discount_percent }}%</td>
+          <td>
+            {% if p.effective_price_difference != None %}
+              {% if p.is_effectively_cheaper %}<span class="st-badge active">₹{{ p.effective_price_difference|floatformat:0 }} cheaper (after disc.)</span>
+              {% else %}<span class="st-badge danger">₹{{ p.effective_price_difference|floatformat:0 }} higher (after disc.)</span>{% endif %}
+            {% else %}—{% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="st-empty-state">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 12h18M3 6h18M3 18h12"/></svg>
+    <p class="mb-0">No price comparisons recorded yet.</p>
+  </div>
+  {% endif %}
+</div>
+{% include "tracker/_pagination.html" %}
+{% endblock %}

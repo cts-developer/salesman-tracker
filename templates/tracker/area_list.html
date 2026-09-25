@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Areas{% endblock %}
+{% block crumb %}Management{% endblock %}
+{% block page_title %}Areas{% endblock %}
+{% block topbar_action %}<a href="{% url 'tracker:area_create' %}" class="btn btn-st-accent">+ Add Area</a>{% endblock %}
+
+{% block content %}
+<div class="st-card">
+  {% if areas %}
+  <div class="st-table-wrap">
+    <table class="table-st mb-0">
+      <thead><tr><th>Area</th><th>Code</th><th>City</th><th>State</th><th>Salesmen</th><th>Status</th><th></th></tr></thead>
+      <tbody>
+        {% for a in areas %}
+        <tr>
+          <td class="st-cell-title">{{ a.name }}</td>
+          <td>{{ a.code }}</td>
+          <td>{{ a.city|default:"—" }}</td>
+          <td>{{ a.state|default:"—" }}</td>
+          <td>{{ a.salesmen_count }}</td>
+          <td>{% if a.is_active %}<span class="st-badge active">Active</span>{% else %}<span class="st-badge inactive">Inactive</span>{% endif %}</td>
+          <td><a href="{% url 'tracker:area_edit' a.pk %}" class="btn btn-st-outline btn-sm-st">Edit</a></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="st-empty-state"><p class="mb-0">No areas configured yet.</p></div>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Check In{% endblock %}
+{% block crumb %}Field Tracking{% endblock %}
+{% block page_title %}Check In at a Dealer / Counter{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-7">
+    <div class="st-card">
+      <div class="st-card-header"><h3>New Visit</h3></div>
+      <div class="st-card-body">
+        <form method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+
+          <div class="mb-3">
+            <label class="st-form-label">Dealer / Counter *</label>
+            {{ form.dealer }}
+          </div>
+
+          <div class="mb-3">
+            <label class="st-form-label">GPS Location *</label>
+            <div class="d-flex align-items-center gap-2 flex-wrap">
+              <button type="button" class="btn btn-st-outline btn-sm-st" onclick="stCaptureLocation('id_check_in_lat','id_check_in_lng','locStatus')">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px;" class="me-1"><path d="M12 21s7-6.1 7-11.5A7 7 0 0 0 5 9.5C5 14.9 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.4"/></svg>
+                Capture My Location
+              </button>
+              <span id="locStatus" class="text-muted-st" style="font-size:0.82rem;">Tap to fetch GPS coordinates</span>
+            </div>
+            {{ form.check_in_lat }}
+            {{ form.check_in_lng }}
+          </div>
+
+          <div class="mb-3">
+            <label class="st-form-label">Notes</label>
+            {{ form.notes }}
+          </div>
+
+          <div class="mb-3">
+            <label class="st-form-label">Photo (optional)</label>
+            {{ form.photo }}
+          </div>
+
+          <button type="submit" class="btn btn-st-accent w-100 py-2 mt-2">Confirm Check-In</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

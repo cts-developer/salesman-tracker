@@ -1,0 +1,187 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% block title %}Dashboard{% endblock %}
+{% block crumb %}Overview{% endblock %}
+{% block page_title %}Welcome back, {{ user.first_name|default:user.username }}{% endblock %}
+{% block topbar_action %}
+  <a href="{% url 'tracker:check_in' %}" class="btn btn-st-accent">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" class="me-1" style="vertical-align:-2px;"><path d="M12 21s7-6.1 7-11.5A7 7 0 0 0 5 9.5C5 14.9 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.4"/></svg>
+    Check In
+  </a>
+{% endblock %}
+
+{% block content %}
+
+{% for visit in open_visits %}
+  <div class="st-card mb-3" style="border-left:3px solid var(--st-green-600);">
+    <div class="st-card-body d-flex align-items-center justify-content-between flex-wrap gap-2">
+      <div class="d-flex align-items-center gap-3">
+        <span class="st-badge active live"><span class="st-dot"></span>Visit in progress</span>
+        <div>
+          <strong>{{ visit.dealer.name }}</strong>
+          <div class="text-muted-st" style="font-size:0.8rem;">Checked in at {{ visit.check_in_time|time:"g:i A" }} · {{ visit.duration_display }} so far</div>
+        </div>
+      </div>
+      <a href="{% url 'tracker:visit_active' %}" class="btn btn-st-primary btn-sm-st">Manage Visit</a>
+    </div>
+  </div>
+{% endfor %}
+
+<!-- Stat cards -->
+<div class="row g-3 mb-4">
+  <div class="col-6 col-lg-3">
+    <div class="st-stat-card">
+      <div class="st-stat-icon amber">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="7" width="18" height="13" rx="1.5"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+      </div>
+      <div class="st-stat-value">{{ total_dealers }}</div>
+      <div class="st-stat-label">Active Dealers / Counters</div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="st-stat-card">
+      <div class="st-stat-icon blue">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg>
+      </div>
+      <div class="st-stat-value">{{ visits_today }}</div>
+      <div class="st-stat-label">Visits Today</div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="st-stat-card">
+      <div class="st-stat-icon green">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 17l5-5 4 4 8-8"/><path d="M14 8h6v6"/></svg>
+      </div>
+      <div class="st-stat-value">
+        ₹{{ turnover.this_month|floatformat:0|intcomma }}
+        {% if turnover.direction == "up" %}<span class="text-success" style="font-size:0.85rem;">▲ {{ turnover.growth_percent }}%</span>
+        {% elif turnover.direction == "down" %}<span class="text-danger" style="font-size:0.85rem;">▼ {{ turnover.growth_percent }}%</span>
+        {% else %}<span class="text-muted-st" style="font-size:0.85rem;">— 0%</span>{% endif %}
+      </div>
+      <div class="st-stat-label">Turnover This Month (vs last)</div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="st-stat-card">
+      <div class="st-stat-icon navy">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/></svg>
+      </div>
+      <div class="st-stat-value">₹{{ turnover.overall|floatformat:0|intcomma }}</div>
+      <div class="st-stat-label">Overall Turnover</div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-3 mb-1">
+  <div class="col-12 col-md-6">
+    <div class="st-stat-card" style="text-align:left; padding:0.9rem 1.1rem;">
+      <div class="text-muted-st" style="font-size:0.75rem;">Last Month's Turnover</div>
+      <strong style="font-size:1.1rem;">₹{{ turnover.last_month|floatformat:0|intcomma }}</strong>
+    </div>
+  </div>
+</div>
+
+<div class="row g-3">
+  <!-- Recent visits -->
+  <div class="col-lg-7">
+    <div class="st-card mb-3">
+      <div class="st-card-header">
+        <h3>Recent Visits</h3>
+        <a href="{% url 'tracker:visit_list' %}" class="btn btn-st-outline btn-sm-st">View all</a>
+      </div>
+      {% if recent_visits %}
+        <div class="st-table-wrap">
+          <table class="table-st mb-0">
+            <thead><tr><th>Counter</th>{% if not is_salesman_user %}<th>Salesman</th>{% endif %}<th>Check-in</th><th>Status</th></tr></thead>
+            <tbody>
+              {% for v in recent_visits %}
+              <tr onclick="window.location='{% url 'tracker:visit_detail' v.pk %}'" style="cursor:pointer;">
+                <td class="st-cell-title">{{ v.dealer.name }}</td>
+                {% if not is_salesman_user %}<td>{{ v.salesman.get_full_name|default:v.salesman.username }}</td>{% endif %}
+                <td>{{ v.check_in_time|date:"d M, g:i A" }}</td>
+                <td>
+                  {% if v.is_open %}<span class="st-badge active live"><span class="st-dot"></span>In progress</span>
+                  {% else %}<span class="st-badge neutral">{{ v.duration_display }}</span>{% endif %}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <div class="st-empty-state">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg>
+          <p class="mb-0">No visits recorded yet. Check in at a counter to get started.</p>
+        </div>
+      {% endif %}
+    </div>
+
+    {% if not is_salesman_user and area_performance %}
+    <div class="st-card">
+      <div class="st-card-header">
+        <h3>Area Performance Snapshot</h3>
+        <a href="{% url 'tracker:area_report' %}" class="btn btn-st-outline btn-sm-st">Full report</a>
+      </div>
+      <div class="st-table-wrap">
+        <table class="table-st mb-0">
+          <thead><tr><th>Area</th><th>Dealers / Counters</th><th>Turnover</th></tr></thead>
+          <tbody>
+            {% for a in area_performance %}
+            <tr>
+              <td class="st-cell-title">{{ a.name }}</td>
+              <td>{{ a.dealers_count }}</td>
+              <td>₹{{ a.turnover_total|default:0|floatformat:0|intcomma }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Side column -->
+  <div class="col-lg-5">
+    <div class="st-card mb-3">
+      <div class="st-card-header">
+        <h3>Active Project Visits</h3>
+        <a href="{% url 'tracker:project_list' %}" class="btn btn-st-outline btn-sm-st">View all</a>
+      </div>
+      <div class="st-card-body">
+        {% for p in active_projects %}
+          <div class="d-flex justify-content-between align-items-start {% if not forloop.last %}mb-3 pb-3{% endif %}" style="{% if not forloop.last %}border-bottom:1px solid var(--st-border);{% endif %}">
+            <div>
+              <a href="{% url 'tracker:project_detail' p.pk %}" class="st-cell-title" style="color:var(--st-navy-800); font-weight:600;">{{ p.project_name }}</a>
+              <div class="text-muted-st" style="font-size:0.78rem;">{{ p.get_project_type_display }} · {{ p.area.name|default:"—" }}</div>
+            </div>
+            <span class="st-badge {% if p.stage == 'finalized' %}active{% elif p.stage == 'negotiation' %}pending{% else %}info{% endif %}">{{ p.get_stage_display }}</span>
+          </div>
+        {% empty %}
+          <p class="text-muted-st mb-0" style="font-size:0.85rem;">No active project visits logged.</p>
+        {% endfor %}
+      </div>
+    </div>
+
+    {% if not is_salesman_user and top_salesmen %}
+    <div class="st-card">
+      <div class="st-card-header"><h3>Top Performers</h3></div>
+      <div class="st-card-body">
+        {% for s in top_salesmen %}
+          <div class="d-flex align-items-center justify-content-between {% if not forloop.last %}mb-3{% endif %}">
+            <div class="d-flex align-items-center gap-2">
+              <div class="st-avatar" style="width:30px;height:30px;font-size:0.7rem;">{{ s.first_name|first|default:s.username|first|upper }}</div>
+              <div>
+                <div style="font-size:0.85rem; font-weight:600; color:var(--st-navy-800);">{{ s.get_full_name|default:s.username }}</div>
+                <div class="text-muted-st" style="font-size:0.75rem;">{{ s.visit_count }} visits</div>
+              </div>
+            </div>
+            <strong style="font-size:0.85rem; color:var(--st-green-600);">₹{{ s.turnover_total|default:0|floatformat:0|intcomma }}</strong>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+{% endblock %}

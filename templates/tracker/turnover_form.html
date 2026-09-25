@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block crumb %}Turnover{% endblock %}
+{% block page_title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-7">
+    <div class="st-card">
+      <div class="st-card-body">
+        <form method="post">
+          {% csrf_token %}
+          <div class="row g-3">
+            <div class="col-md-6"><label class="st-form-label">Dealer / Counter *</label>{{ form.dealer }}</div>
+            <div class="col-md-6"><label class="st-form-label">Brand *</label>{{ form.brand }}</div>
+            <div class="col-md-6"><label class="st-form-label">Product (optional)</label>{{ form.product }}</div>
+            <div class="col-md-6"><label class="st-form-label">Amount (₹) *</label>{{ form.amount }}</div>
+            <div class="col-md-6"><label class="st-form-label">Date *</label>{{ form.date }}</div>
+            <div class="col-12"><label class="st-form-label">Remarks</label>{{ form.remarks }}</div>
+          </div>
+          <button type="submit" class="btn btn-st-primary mt-4">Save Entry</button>
+          <a href="{% url 'tracker:turnover_list' %}" class="btn btn-st-outline mt-4">Cancel</a>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

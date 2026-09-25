@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block title %}Dealers & Counters{% endblock %}
+{% block crumb %}Sales Data{% endblock %}
+{% block page_title %}Dealers & Counters{% endblock %}
+{% block topbar_action %}{% if is_owner_user or is_area_manager_user %}<a href="{% url 'tracker:dealer_create' %}" class="btn btn-st-accent">+ Add Dealer</a>{% endif %}{% endblock %}
+
+{% block content %}
+<div class="row g-3 mb-3">
+  <div class="col-6 col-md-3">
+    <div class="st-stat-card">
+      <div class="st-stat-value">{{ total_active }}</div>
+      <div class="st-stat-label">Active</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="st-stat-card">
+      <div class="st-stat-value">{{ total_inactive }}</div>
+      <div class="st-stat-label">Inactive</div>
+    </div>
+  </div>
+</div>
+
+<div class="st-filter-bar">
+  <form method="get" class="row g-2 align-items-end">
+    <div class="col-12 col-md-5">
+      <label class="st-form-label">Search</label>
+      <input type="text" name="q" value="{{ filters.q }}" placeholder="Search by name, owner or address" class="form-control form-control-sm">
+    </div>
+    <div class="col-6 col-md-3">
+      <label class="st-form-label">Area</label>
+      <select name="area" class="form-select form-select-sm">
+        <option value="">All Areas</option>
+        {% for a in areas %}<option value="{{ a.pk }}" {% if filters.area == a.pk|stringformat:"s" %}selected{% endif %}>{{ a.name }}</option>{% endfor %}
+      </select>
+    </div>
+    <div class="col-6 col-md-2">
+      <label class="st-form-label">Status</label>
+      <select name="status" class="form-select form-select-sm">
+        <option value="">All</option>
+        <option value="active" {% if filters.status == "active" %}selected{% endif %}>Active</option>
+        <option value="inactive" {% if filters.status == "inactive" %}selected{% endif %}>Inactive</option>
+      </select>
+    </div>
+    <div class="col-6 col-md-2"><button class="btn btn-st-outline btn-sm-st w-100">Filter</button></div>
+  </form>
+</div>
+
+<div class="st-card">
+  {% if page_obj %}
+  <div class="st-table-wrap">
+    <table class="table-st mb-0">
+      <thead><tr><th>Dealer / Counter</th><th>Owner</th><th>Type</th><th>Area</th><th>Phone</th><th>Visits</th><th>Status</th></tr></thead>
+      <tbody>
+        {% for d in page_obj %}
+        <tr onclick="window.location='{% url 'tracker:dealer_detail' d.pk %}'" style="cursor:pointer;">
+          <td class="st-cell-title">{{ d.name }}</td>
+          <td>{{ d.owner_name|default:"—" }}</td>
+          <td>{{ d.get_counter_type_display }}</td>
+          <td>{{ d.area.name|default:"—" }}</td>
+          <td>{{ d.phone|default:"—" }}</td>
+          <td>{{ d.visit_count }}</td>
+          <td>{% if d.is_active %}<span class="st-badge active">Active</span>{% else %}<span class="st-badge inactive">Inactive</span>{% endif %}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="st-empty-state">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="7" width="18" height="13" rx="1.5"/></svg>
+    <p class="mb-0">No dealers found.</p>
+  </div>
+  {% endif %}
+</div>
+{% include "tracker/_pagination.html" %}
+{% endblock %}

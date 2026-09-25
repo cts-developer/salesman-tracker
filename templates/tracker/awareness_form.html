@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block crumb %}Product Awareness{% endblock %}
+{% block page_title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-7">
+    <div class="st-card">
+      <div class="st-card-body">
+        <form method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="row g-3">
+            <div class="col-md-6"><label class="st-form-label">Dealer / Counter *</label>{{ form.dealer }}</div>
+            <div class="col-md-6"><label class="st-form-label">Product *</label>{{ form.product }}</div>
+            <div class="col-md-6 form-check ms-1 mt-4">{{ form.is_in_stock }} <label class="form-check-label st-form-label">Product is in stock</label></div>
+            <div class="col-md-6"><label class="st-form-label">Estimated Stock Quantity</label>{{ form.stock_quantity_estimate }}</div>
+            <div class="col-md-6"><label class="st-form-label">Display Quality</label>{{ form.display_quality }}</div>
+            <div class="col-md-6 form-check ms-1 mt-4">{{ form.is_visible_to_customer }} <label class="form-check-label st-form-label">Clearly visible to customers</label></div>
+            <div class="col-12"><label class="st-form-label">Photo</label>{{ form.photo }}</div>
+            <div class="col-12"><label class="st-form-label">Remarks</label>{{ form.remarks }}</div>
+          </div>
+          <button type="submit" class="btn btn-st-primary mt-4">Save Record</button>
+          <a href="{% url 'tracker:awareness_list' %}" class="btn btn-st-outline mt-4">Cancel</a>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

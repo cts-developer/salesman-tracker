@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% block title %}Turnover{% endblock %}
+{% block crumb %}Sales Data{% endblock %}
+{% block page_title %}Turnover{% endblock %}
+{% block topbar_action %}<a href="{% url 'tracker:turnover_create' %}" class="btn btn-st-accent">+ Add Entry</a>{% endblock %}
+
+{% block content %}
+<div class="row g-3 mb-3">
+  <div class="col-12 col-md-3">
+    <div class="st-stat-card">
+      <div class="st-stat-icon green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 17l5-5 4 4 8-8"/></svg></div>
+      <div class="st-stat-value">₹{{ summary.this_month|floatformat:0|intcomma }}</div>
+      <div class="st-stat-label">
+        This Month
+        {% if summary.direction == "up" %}<span class="text-success">▲ {{ summary.growth_percent }}%</span>
+        {% elif summary.direction == "down" %}<span class="text-danger">▼ {{ summary.growth_percent }}%</span>
+        {% else %}<span class="text-muted-st">— 0%</span>{% endif %}
+      </div>
+    </div>
+  </div>
+  <div class="col-12 col-md-3">
+    <div class="st-stat-card">
+      <div class="st-stat-value">₹{{ summary.last_month|floatformat:0|intcomma }}</div>
+      <div class="st-stat-label">Last Month</div>
+    </div>
+  </div>
+  <div class="col-12 col-md-3">
+    <div class="st-stat-card">
+      <div class="st-stat-value">₹{{ total|floatformat:0|intcomma }}</div>
+      <div class="st-stat-label">Overall Turnover</div>
+    </div>
+  </div>
+</div>
+
+<div class="st-card">
+  {% if page_obj %}
+  <div class="st-table-wrap">
+    <table class="table-st mb-0">
+      <thead><tr><th>Date</th><th>Salesman</th><th>Dealer / Counter</th><th>Brand</th><th>Product</th><th>Amount</th></tr></thead>
+      <tbody>
+        {% for t in page_obj %}
+        <tr>
+          <td>{{ t.date }}</td>
+          <td>{{ t.salesman.get_full_name|default:t.salesman.username }}</td>
+          <td class="st-cell-title">{{ t.dealer.name|default:"—" }}</td>
+          <td>{% if t.brand %}<span class="st-badge {% if t.brand.brand_type == 'own' %}info{% else %}neutral{% endif %}">{{ t.brand.name }}</span>{% else %}—{% endif %}</td>
+          <td>{{ t.product|default:"—" }}</td>
+          <td><strong style="color:var(--st-green-600);">₹{{ t.amount|intcomma }}</strong></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="st-empty-state">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 17l5-5 4 4 8-8"/></svg>
+    <p class="mb-0">No turnover recorded yet.</p>
+  </div>
+  {% endif %}
+</div>
+{% include "tracker/_pagination.html" %}
+{% endblock %}

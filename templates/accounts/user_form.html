@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block crumb %}Management{% endblock %}
+{% block page_title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-7">
+    <div class="st-card">
+      <div class="st-card-body">
+        <form method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="row g-3">
+            {% if form.username %}<div class="col-md-6"><label class="st-form-label">Username *</label>{{ form.username }}</div>{% endif %}
+            {% if form.role %}<div class="col-md-6"><label class="st-form-label">Role</label>{{ form.role }}</div>{% endif %}
+            {% if form.manager %}<div class="col-md-6"><label class="st-form-label">Reports To (Area Manager)</label>{{ form.manager }}</div>{% endif %}
+            <div class="col-md-6"><label class="st-form-label">First Name</label>{{ form.first_name }}</div>
+            <div class="col-md-6"><label class="st-form-label">Last Name</label>{{ form.last_name }}</div>
+            <div class="col-md-6"><label class="st-form-label">Email</label>{{ form.email }}</div>
+            <div class="col-md-6"><label class="st-form-label">Phone</label>{{ form.phone }}</div>
+            <div class="col-md-6"><label class="st-form-label">Employee Code</label>{{ form.employee_code }}</div>
+            <div class="col-md-6"><label class="st-form-label">Area</label>{{ form.area }}</div>
+            {% if form.password1 %}
+            <div class="col-md-6"><label class="st-form-label">Password *</label>{{ form.password1 }}</div>
+            <div class="col-md-6"><label class="st-form-label">Confirm Password *</label>{{ form.password2 }}</div>
+            {% endif %}
+            {% if form.is_active_employee %}
+            <div class="col-12 form-check ms-1">{{ form.is_active_employee }} <label class="form-check-label st-form-label">Active Employee</label></div>
+            {% endif %}
+            <div class="col-12"><label class="st-form-label">Profile Photo</label>{{ form.profile_photo }}</div>
+          </div>
+          {% if form.errors %}
+            <div class="alert alert-danger mt-3 py-2" style="font-size:0.85rem;">
+              {% for field in form %}{% for error in field.errors %}<div>{{ field.label }}: {{ error }}</div>{% endfor %}{% endfor %}
+              {% for error in form.non_field_errors %}<div>{{ error }}</div>{% endfor %}
+            </div>
+          {% endif %}
+          <button type="submit" class="btn btn-st-primary mt-4">Save User</button>
+          <a href="{% url 'accounts:user_list' %}" class="btn btn-st-outline mt-4">Cancel</a>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

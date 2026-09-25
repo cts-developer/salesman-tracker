@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% block title %}Project Visits{% endblock %}
+{% block crumb %}Sales Data{% endblock %}
+{% block page_title %}Project Visits{% endblock %}
+{% block topbar_action %}<a href="{% url 'tracker:project_create' %}" class="btn btn-st-accent">+ Log Project Visit</a>{% endblock %}
+
+{% block content %}
+<div class="row g-3 mb-3">
+  <div class="col-12 col-md-4">
+    <div class="st-stat-card">
+      <div class="st-stat-icon amber"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 21V9l5-4 5 4v12"/></svg></div>
+      <div class="st-stat-value">₹{{ pipeline_value|floatformat:0|intcomma }}</div>
+      <div class="st-stat-label">Active Pipeline Value</div>
+    </div>
+  </div>
+</div>
+
+<div class="st-filter-bar">
+  <form method="get" class="row g-2 align-items-end">
+    <div class="col-8 col-md-4">
+      <label class="st-form-label">Stage</label>
+      <select name="stage" class="form-select form-select-sm">
+        <option value="">All Stages</option>
+        <option value="lead" {% if filters.stage == "lead" %}selected{% endif %}>Lead / Prospect</option>
+        <option value="negotiation" {% if filters.stage == "negotiation" %}selected{% endif %}>Negotiation</option>
+        <option value="finalized" {% if filters.stage == "finalized" %}selected{% endif %}>Finalized</option>
+        <option value="execution" {% if filters.stage == "execution" %}selected{% endif %}>Under Execution</option>
+        <option value="lost" {% if filters.stage == "lost" %}selected{% endif %}>Lost</option>
+      </select>
+    </div>
+    <div class="col-4 col-md-2"><button class="btn btn-st-outline btn-sm-st w-100">Filter</button></div>
+  </form>
+</div>
+
+<div class="st-card">
+  {% if page_obj %}
+  <div class="st-table-wrap">
+    <table class="table-st mb-0">
+      <thead><tr><th>Project</th><th>Type</th><th>Salesman</th><th>Stage</th><th>Expected Value</th><th>Visit Date</th></tr></thead>
+      <tbody>
+        {% for p in page_obj %}
+        <tr onclick="window.location='{% url 'tracker:project_detail' p.pk %}'" style="cursor:pointer;">
+          <td class="st-cell-title">{{ p.project_name }}</td>
+          <td>{{ p.get_project_type_display }}</td>
+          <td>{{ p.salesman.get_full_name|default:p.salesman.username }}</td>
+          <td>
+            {% if p.stage == "finalized" %}<span class="st-badge active">{{ p.get_stage_display }}</span>
+            {% elif p.stage == "lost" %}<span class="st-badge danger">{{ p.get_stage_display }}</span>
+            {% elif p.stage == "negotiation" %}<span class="st-badge pending">{{ p.get_stage_display }}</span>
+            {% else %}<span class="st-badge info">{{ p.get_stage_display }}</span>{% endif %}
+          </td>
+          <td>₹{{ p.expected_business_value|intcomma }}</td>
+          <td>{{ p.visit_date }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="st-empty-state">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 21V9l5-4 5 4v12"/></svg>
+    <p class="mb-0">No project visits logged yet.</p>
+  </div>
+  {% endif %}
+</div>
+{% include "tracker/_pagination.html" %}
+{% endblock %}

@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% block title %}{{ dealer.name }}{% endblock %}
+{% block crumb %}Dealers & Counters{% endblock %}
+{% block page_title %}{{ dealer.name }}{% endblock %}
+{% block topbar_action %}{% if is_owner_user or is_area_manager_user %}<a href="{% url 'tracker:dealer_edit' dealer.pk %}" class="btn btn-st-outline">Edit</a>{% endif %}{% endblock %}
+
+{% block content %}
+<div class="row g-3 mb-3">
+  <div class="col-6 col-md-3">
+    <div class="st-stat-card"><div class="st-stat-value">{{ visit_count }}</div><div class="st-stat-label">Total Visits</div></div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="st-stat-card"><div class="st-stat-value">₹{{ turnover_total|floatformat:0|intcomma }}</div><div class="st-stat-label">Total Turnover</div></div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="st-stat-card">
+      <div class="st-stat-value">
+        ₹{{ turnover_summary.this_month|floatformat:0|intcomma }}
+        {% if turnover_summary.direction == "up" %}<span class="text-success" style="font-size:0.9rem;">▲ {{ turnover_summary.growth_percent }}%</span>
+        {% elif turnover_summary.direction == "down" %}<span class="text-danger" style="font-size:0.9rem;">▼ {{ turnover_summary.growth_percent }}%</span>
+        {% else %}<span class="text-muted-st" style="font-size:0.9rem;">— 0%</span>{% endif %}
+      </div>
+      <div class="st-stat-label">This Month (vs last)</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <a href="{% url 'tracker:dealer_turnover_comparison' dealer.pk %}" class="text-decoration-none">
+      <div class="st-stat-card" style="cursor:pointer;"><div class="st-stat-value" style="color:var(--st-blue-600);">In-house vs Competitor →</div><div class="st-stat-label">Turnover Comparison</div></div>
+    </a>
+  </div>
+</div>
+
+<div class="row g-3">
+  <div class="col-lg-4">
+    <div class="st-card mb-3">
+      <div class="st-card-header"><h3>Dealer / Counter Details</h3></div>
+      <div class="st-card-body">
+        <div class="mb-2"><div class="text-muted-st" style="font-size:0.75rem;">Owner</div><strong>{{ dealer.owner_name|default:"—" }}</strong></div>
+        <div class="mb-2"><div class="text-muted-st" style="font-size:0.75rem;">Contact Person</div><strong>{{ dealer.contact_person|default:"—" }}</strong></div>
+        <div class="mb-2"><div class="text-muted-st" style="font-size:0.75rem;">Phone</div><strong>{{ dealer.phone|default:"—" }}</strong></div>
+        <div class="mb-2"><div class="text-muted-st" style="font-size:0.75rem;">Email</div><strong>{{ dealer.email|default:"—" }}</strong></div>
+        <div class="mb-2"><div class="text-muted-st" style="font-size:0.75rem;">Type</div><strong>{{ dealer.get_counter_type_display }}</strong></div>
+        <div class="mb-2"><div class="text-muted-st" style="font-size:0.75rem;">Area</div><strong>{{ dealer.area.name|default:"—" }}</strong></div>
+        <div class="mb-2"><div class="text-muted-st" style="font-size:0.75rem;">Address</div><strong>{{ dealer.address|default:"—" }}</strong></div>
+        {% if dealer.latitude %}
+        <div class="mb-2"><div class="text-muted-st" style="font-size:0.75rem;">GPS Coordinates</div><strong>{{ dealer.latitude }}, {{ dealer.longitude }}</strong></div>
+        {% endif %}
+        <div class="mb-0"><div class="text-muted-st" style="font-size:0.75rem;">GST Number</div><strong>{{ dealer.gst_number|default:"—" }}</strong></div>
+      </div>
+    </div>
+
+    <div class="st-card mb-3">
+      <div class="st-card-header"><h3>Brands &amp; Products Dealt</h3></div>
+      <div class="st-card-body">
+        <div class="text-muted-st mb-1" style="font-size:0.75rem;">Brands</div>
+        <div class="mb-3">
+          {% for b in dealer.brands_dealt.all %}<span class="st-badge {% if b.brand_type == 'own' %}info{% else %}neutral{% endif %} me-1 mb-1">{{ b.name }}</span>{% empty %}<span class="text-muted-st" style="font-size:0.85rem;">None listed</span>{% endfor %}
+        </div>
+        <div class="text-muted-st mb-1" style="font-size:0.75rem;">Products</div>
+        <div>
+          {% for p in dealer.products_dealt.all %}<span class="st-badge neutral me-1 mb-1">{{ p.name }}</span>{% empty %}<span class="text-muted-st" style="font-size:0.85rem;">None listed</span>{% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <a href="{% url 'tracker:check_in' %}" class="btn btn-st-accent w-100">Check In Here</a>
+  </div>
+
+  <div class="col-lg-8">
+    <div class="st-card mb-3">
+      <div class="st-card-header"><h3>Recent Visits</h3></div>
+      {% if visits %}
+      <div class="st-table-wrap">
+        <table class="table-st mb-0">
+          <thead><tr><th>Salesman</th><th>Check-in</th></tr></thead>
+          <tbody>
+            {% for v in visits %}
+            <tr onclick="window.location='{% url 'tracker:visit_detail' v.pk %}'" style="cursor:pointer;">
+              <td>{{ v.salesman.get_full_name|default:v.salesman.username }}</td><td>{{ v.check_in_time|date:"d M, g:i A" }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}<div class="st-empty-state"><p class="mb-0">No visits recorded.</p></div>{% endif %}
+    </div>
+
+    <div class="st-card mb-3">
+      <div class="st-card-header">
+        <h3>Turnover History</h3>
+        <a href="{% url 'tracker:dealer_visit_count' dealer.pk %}" class="btn btn-st-outline btn-sm-st">Visit Breakdown</a>
+      </div>
+      {% if turnovers %}
+      <div class="st-table-wrap">
+        <table class="table-st mb-0">
+          <thead><tr><th>Date</th><th>Brand</th><th>Product</th><th>Amount</th></tr></thead>
+          <tbody>
+            {% for t in turnovers %}
+            <tr>
+              <td>{{ t.date }}</td>
+              <td>{% if t.brand %}<span class="st-badge {% if t.brand.brand_type == 'own' %}info{% else %}neutral{% endif %}">{{ t.brand.name }}</span>{% else %}—{% endif %}</td>
+              <td>{{ t.product|default:"—" }}</td>
+              <td>₹{{ t.amount|intcomma }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}<div class="st-empty-state"><p class="mb-0">No turnover recorded yet.</p></div>{% endif %}
+    </div>
+
+    <div class="st-card">
+      <div class="st-card-header"><h3>Price &amp; Discount Comparisons</h3></div>
+      {% if prices %}
+      <div class="st-table-wrap">
+        <table class="table-st mb-0">
+          <thead><tr><th>Our Product</th><th>Our Price</th><th>Our Disc.</th><th>Competitor</th><th>Their Price</th><th>Their Disc.</th></tr></thead>
+          <tbody>
+            {% for p in prices %}
+            <tr>
+              <td>{{ p.our_product.name }}</td><td>₹{{ p.our_price }}</td><td>{{ p.our_discount_percent }}%</td>
+              <td>{{ p.competitor_product|default:"—" }}</td>
+              <td>{% if p.competitor_price %}₹{{ p.competitor_price }}{% else %}—{% endif %}</td>
+              <td>{{ p.competitor_discount_percent }}%</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}<div class="st-empty-state"><p class="mb-0">No price comparisons recorded yet.</p></div>{% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

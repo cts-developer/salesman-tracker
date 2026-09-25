@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block title %}Visit & Travel History{% endblock %}
+{% block crumb %}Field Tracking{% endblock %}
+{% block page_title %}Visit &amp; Travel History{% endblock %}
+{% block topbar_action %}<a href="{% url 'tracker:check_in' %}" class="btn btn-st-accent">+ New Check-In</a>{% endblock %}
+
+{% block content %}
+<div class="st-filter-bar">
+  <form method="get" class="row g-2 align-items-end">
+    {% if not is_salesman_user %}
+    <div class="col-6 col-md-3">
+      <label class="st-form-label">Area</label>
+      <select name="area" class="form-select form-select-sm">
+        <option value="">All Areas</option>
+        {% for a in areas %}<option value="{{ a.pk }}" {% if filters.area == a.pk|stringformat:"s" %}selected{% endif %}>{{ a.name }}</option>{% endfor %}
+      </select>
+    </div>
+    <div class="col-6 col-md-3">
+      <label class="st-form-label">Salesman</label>
+      <select name="salesman" class="form-select form-select-sm">
+        <option value="">All Salesmen</option>
+        {% for s in salesmen %}<option value="{{ s.pk }}" {% if filters.salesman == s.pk|stringformat:"s" %}selected{% endif %}>{{ s.get_full_name|default:s.username }}</option>{% endfor %}
+      </select>
+    </div>
+    {% endif %}
+    <div class="col-6 col-md-3">
+      <label class="st-form-label">From</label>
+      <input type="date" name="date_from" value="{{ filters.date_from }}" class="form-control form-control-sm">
+    </div>
+    <div class="col-6 col-md-3">
+      <label class="st-form-label">To</label>
+      <input type="date" name="date_to" value="{{ filters.date_to }}" class="form-control form-control-sm">
+    </div>
+    <div class="col-12">
+      <button class="btn btn-st-outline btn-sm-st mt-1">Apply Filters</button>
+      <a href="{% url 'tracker:visit_list' %}" class="btn btn-st-outline btn-sm-st mt-1" style="border:none;">Clear</a>
+    </div>
+  </form>
+</div>
+
+<div class="st-card">
+  {% if page_obj %}
+  <div class="st-table-wrap">
+    <table class="table-st mb-0">
+      <thead>
+        <tr>
+          <th>Dealer / Counter</th>
+          {% if not is_salesman_user %}<th>Salesman</th>{% endif %}
+          <th>Area</th>
+          <th>Check-in</th>
+          <th>Check-out</th>
+          <th>Time Spent</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for v in page_obj %}
+        <tr onclick="window.location='{% url 'tracker:visit_detail' v.pk %}'" style="cursor:pointer;">
+          <td class="st-cell-title">{{ v.dealer.name }}</td>
+          {% if not is_salesman_user %}<td>{{ v.salesman.get_full_name|default:v.salesman.username }}</td>{% endif %}
+          <td>{{ v.dealer.area.name|default:"—" }}</td>
+          <td>{{ v.check_in_time|date:"d M, g:i A" }}</td>
+          <td>{% if v.check_out_time %}{{ v.check_out_time|date:"d M, g:i A" }}{% else %}—{% endif %}</td>
+          <td>{{ v.duration_display }}</td>
+          <td>{% if v.is_open %}<span class="st-badge active live"><span class="st-dot"></span>Active</span>{% else %}<span class="st-badge neutral">Completed</span>{% endif %}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="st-empty-state">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg>
+    <p class="mb-0">No visits match your filters.</p>
+  </div>
+  {% endif %}
+</div>
+{% include "tracker/_pagination.html" %}
+{% endblock %}

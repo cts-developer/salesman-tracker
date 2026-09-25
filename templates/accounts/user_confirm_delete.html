@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Remove User{% endblock %}
+{% block crumb %}Management{% endblock %}
+{% block page_title %}Remove {{ target.username }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-6">
+    <div class="st-card">
+      <div class="st-card-body">
+        <p>Are you sure you want to remove <strong>{{ target.get_full_name|default:target.username }}</strong> ({{ target.get_role_display }})? This action cannot be undone.</p>
+        <form method="post">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-st-primary" style="background:#b23b3b; border-color:#b23b3b;">Yes, Remove User</button>
+          <a href="{% url 'accounts:user_list' %}" class="btn btn-st-outline">Cancel</a>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

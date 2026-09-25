@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% block title %}Visit Detail{% endblock %}
+{% block crumb %}Field Tracking{% endblock %}
+{% block page_title %}Visit at {{ visit.dealer.name }}{% endblock %}
+
+{% block content %}
+<div class="row g-3">
+  <div class="col-lg-8">
+    <div class="st-card mb-3">
+      <div class="st-card-header">
+        <h3>Visit Summary</h3>
+        {% if visit.is_open %}<span class="st-badge active live"><span class="st-dot"></span>In progress</span>{% else %}<span class="st-badge neutral">Completed</span>{% endif %}
+      </div>
+      <div class="st-card-body">
+        <div class="row g-3">
+          <div class="col-6 col-md-3">
+            <div class="text-muted-st" style="font-size:0.75rem;">Salesman</div>
+            <strong>{{ visit.salesman.get_full_name|default:visit.salesman.username }}</strong>
+          </div>
+          <div class="col-6 col-md-3">
+            <div class="text-muted-st" style="font-size:0.75rem;">Dealer / Counter</div>
+            <strong><a href="{% url 'tracker:dealer_detail' visit.dealer.pk %}">{{ visit.dealer.name }}</a></strong>
+          </div>
+          <div class="col-6 col-md-3">
+            <div class="text-muted-st" style="font-size:0.75rem;">Check-in</div>
+            <strong>{{ visit.check_in_time|date:"d M Y, g:i A" }}</strong>
+          </div>
+          <div class="col-6 col-md-3">
+            <div class="text-muted-st" style="font-size:0.75rem;">Check-out</div>
+            <strong>{% if visit.check_out_time %}{{ visit.check_out_time|date:"d M Y, g:i A" }}{% else %}—{% endif %}</strong>
+          </div>
+          <div class="col-6 col-md-3">
+            <div class="text-muted-st" style="font-size:0.75rem;">Time Spent</div>
+            <strong>{{ visit.duration_display }}</strong>
+          </div>
+          <div class="col-6 col-md-3">
+            <div class="text-muted-st" style="font-size:0.75rem;">Check-in GPS</div>
+            <strong>{% if visit.check_in_lat %}{{ visit.check_in_lat }}, {{ visit.check_in_lng }}{% else %}—{% endif %}</strong>
+          </div>
+          <div class="col-6 col-md-3">
+            <div class="text-muted-st" style="font-size:0.75rem;">Check-out GPS</div>
+            <strong>{% if visit.check_out_lat %}{{ visit.check_out_lat }}, {{ visit.check_out_lng }}{% else %}—{% endif %}</strong>
+          </div>
+        </div>
+        {% if visit.notes %}
+          <div class="st-divider"></div>
+          <div class="text-muted-st" style="font-size:0.75rem;">Notes</div>
+          <p class="mb-0">{{ visit.notes }}</p>
+        {% endif %}
+      </div>
+    </div>
+
+    {% if visit.awareness_records.all %}
+    <div class="st-card mb-3">
+      <div class="st-card-header"><h3>Product Awareness Recorded</h3></div>
+      <div class="st-table-wrap">
+        <table class="table-st mb-0">
+          <thead><tr><th>Product</th><th>In Stock</th><th>Display</th></tr></thead>
+          <tbody>
+            {% for a in visit.awareness_records.all %}
+            <tr><td>{{ a.product }}</td><td>{% if a.is_in_stock %}<span class="st-badge active">Yes</span>{% else %}<span class="st-badge danger">No</span>{% endif %}</td><td>{{ a.get_display_quality_display }}</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    {% endif %}
+
+    {% if visit.price_records.all %}
+    <div class="st-card mb-3">
+      <div class="st-card-header"><h3>Price Comparisons Recorded</h3></div>
+      <div class="st-table-wrap">
+        <table class="table-st mb-0">
+          <thead><tr><th>Our Product</th><th>Our Price</th><th>Competitor</th><th>Competitor Price</th></tr></thead>
+          <tbody>
+            {% for p in visit.price_records.all %}
+            <tr><td>{{ p.our_product }}</td><td>₹{{ p.our_price }}</td><td>{{ p.competitor_product|default:"—" }}</td><td>{% if p.competitor_price %}₹{{ p.competitor_price }}{% else %}—{% endif %}</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+
+  <div class="col-lg-4">
+    <div class="st-card">
+      <div class="st-card-header"><h3>Quick Actions</h3></div>
+      <div class="st-card-body d-grid gap-2">
+        {% if visit.is_open %}
+          <a href="{% url 'tracker:visit_active' %}" class="btn btn-st-primary">Manage This Visit</a>
+        {% endif %}
+        <a href="{% url 'tracker:dealer_detail' visit.dealer.pk %}" class="btn btn-st-outline">View Dealer / Counter</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

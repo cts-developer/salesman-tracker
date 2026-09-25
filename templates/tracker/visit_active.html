@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %}Active Visit{% endblock %}
+{% block crumb %}Field Tracking{% endblock %}
+{% block page_title %}Active Visit{% endblock %}
+
+{% block content %}
+{% if visit %}
+<div class="row justify-content-center">
+  <div class="col-lg-7">
+    <div class="st-card mb-3">
+      <div class="st-card-body">
+        <div class="d-flex justify-content-between align-items-start mb-3">
+          <div>
+            <span class="st-badge active live mb-2"><span class="st-dot"></span>Visit in progress</span>
+            <h3 class="mb-0">{{ visit.dealer.name }}</h3>
+            <p class="text-muted-st mb-0" style="font-size:0.85rem;">{{ visit.dealer.address }}</p>
+          </div>
+        </div>
+        <div class="row g-3 mt-1">
+          <div class="col-6">
+            <div class="text-muted-st" style="font-size:0.75rem;">Checked in</div>
+            <strong>{{ visit.check_in_time|date:"d M Y, g:i A" }}</strong>
+          </div>
+          <div class="col-6">
+            <div class="text-muted-st" style="font-size:0.75rem;">Time elapsed</div>
+            <strong>{{ visit.duration_display }}</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="st-card mb-3">
+      <div class="st-card-header"><h3>Log Activity For This Visit</h3></div>
+      <div class="st-card-body d-flex flex-wrap gap-2">
+        <a href="{% url 'tracker:awareness_create' %}" class="btn btn-st-outline">+ Product Awareness</a>
+        <a href="{% url 'tracker:price_create' %}" class="btn btn-st-outline">+ Price Comparison</a>
+        <a href="{% url 'tracker:turnover_create' %}" class="btn btn-st-outline">+ Turnover Entry</a>
+      </div>
+    </div>
+
+    <div class="st-card">
+      <div class="st-card-header"><h3>Check Out</h3></div>
+      <div class="st-card-body">
+        <form method="post" action="{% url 'tracker:check_out' visit.pk %}">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label class="st-form-label">GPS Location *</label>
+            <div class="d-flex align-items-center gap-2 flex-wrap">
+              <button type="button" class="btn btn-st-outline btn-sm-st" onclick="stCaptureLocation('id_check_out_lat','id_check_out_lng','locStatusOut')">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px;" class="me-1"><path d="M12 21s7-6.1 7-11.5A7 7 0 0 0 5 9.5C5 14.9 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.4"/></svg>
+                Capture My Location
+              </button>
+              <span id="locStatusOut" class="text-muted-st" style="font-size:0.82rem;">Tap to fetch GPS coordinates</span>
+            </div>
+            {{ form.check_out_lat }}
+            {{ form.check_out_lng }}
+          </div>
+          <div class="mb-3">
+            <label class="st-form-label">Closing notes</label>
+            {{ form.notes }}
+          </div>
+          <button type="submit" class="btn btn-st-primary w-100 py-2">Confirm Check-Out</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% else %}
+<div class="st-card">
+  <div class="st-empty-state">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 21s7-6.1 7-11.5A7 7 0 0 0 5 9.5C5 14.9 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.4"/></svg>
+    <p>You have no active visit right now.</p>
+    <a href="{% url 'tracker:check_in' %}" class="btn btn-st-accent">Check In Now</a>
+  </div>
+</div>
+{% endif %}
+{% endblock %}

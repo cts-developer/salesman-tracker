@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}{{ dealer.name }} Visit History{% endblock %}
+{% block crumb %}Dealers · {{ dealer.name }}{% endblock %}
+{% block page_title %}Total Visits to {{ dealer.name }}{% endblock %}
+
+{% block content %}
+<div class="row g-3 mb-3">
+  <div class="col-12 col-md-4">
+    <div class="st-stat-card">
+      <div class="st-stat-icon navy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg></div>
+      <div class="st-stat-value">{{ total }}</div>
+      <div class="st-stat-label">Total Visits Recorded</div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-3">
+  <div class="col-lg-4">
+    <div class="st-card">
+      <div class="st-card-header"><h3>Visits by Salesman</h3></div>
+      <div class="st-card-body">
+        {% for s in by_salesman %}
+          <div class="d-flex justify-content-between align-items-center {% if not forloop.last %}mb-2 pb-2{% endif %}" style="{% if not forloop.last %}border-bottom:1px solid var(--st-border);{% endif %}">
+            <span style="font-size:0.85rem;">{{ s.salesman__first_name|default:s.salesman__username }} {{ s.salesman__last_name }}</span>
+            <span class="st-badge info">{{ s.count }} visits</span>
+          </div>
+        {% empty %}
+          <p class="text-muted-st mb-0" style="font-size:0.85rem;">No visits recorded for this dealer yet.</p>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-8">
+    <div class="st-card">
+      <div class="st-card-header"><h3>Full Visit Log</h3></div>
+      {% if page_obj %}
+      <div class="st-table-wrap">
+        <table class="table-st mb-0">
+          <thead><tr><th>Salesman</th><th>Dealer / Counter</th><th>Check-in</th><th>Time Spent</th></tr></thead>
+          <tbody>
+            {% for v in page_obj %}
+            <tr onclick="window.location='{% url 'tracker:visit_detail' v.pk %}'" style="cursor:pointer;">
+              <td>{{ v.salesman.get_full_name|default:v.salesman.username }}</td>
+              <td>{{ dealer.name }}</td>
+              <td>{{ v.check_in_time|date:"d M Y, g:i A" }}</td>
+              <td>{{ v.duration_display }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}<div class="st-empty-state"><p class="mb-0">No visits yet.</p></div>{% endif %}
+    </div>
+    {% include "tracker/_pagination.html" %}
+  </div>
+</div>
+{% endblock %}

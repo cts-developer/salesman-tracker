@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block crumb %}Areas{% endblock %}
+{% block page_title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-6">
+    <div class="st-card">
+      <div class="st-card-body">
+        <form method="post">
+          {% csrf_token %}
+          <div class="row g-3">
+            <div class="col-md-7"><label class="st-form-label">Area Name *</label>{{ form.name }}</div>
+            <div class="col-md-5"><label class="st-form-label">Code *</label>{{ form.code }}</div>
+            <div class="col-md-6"><label class="st-form-label">City</label>{{ form.city }}</div>
+            <div class="col-md-6"><label class="st-form-label">State</label>{{ form.state }}</div>
+            <div class="col-12"><label class="st-form-label">Description</label>{{ form.description }}</div>
+            <div class="col-12 form-check ms-1">{{ form.is_active }} <label class="form-check-label st-form-label">Active</label></div>
+          </div>
+          <button type="submit" class="btn btn-st-primary mt-4">Save Area</button>
+          <a href="{% url 'tracker:area_list' %}" class="btn btn-st-outline mt-4">Cancel</a>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Brand & Product Catalogue{% endblock %}
+{% block crumb %}Management{% endblock %}
+{% block page_title %}Brand &amp; Product Catalogue{% endblock %}
+{% block topbar_action %}
+  <a href="{% url 'tracker:brand_create' %}" class="btn btn-st-outline me-2">+ Brand</a>
+  <a href="{% url 'tracker:product_create' %}" class="btn btn-st-accent">+ Product</a>
+{% endblock %}
+
+{% block content %}
+{% for brand in brands %}
+<div class="st-card mb-3">
+  <div class="st-card-header">
+    <h3>{{ brand.name }} <span class="st-badge {% if brand.brand_type == 'own' %}info{% else %}neutral{% endif %} ms-2">{{ brand.get_brand_type_display }}</span></h3>
+    <div class="d-flex align-items-center gap-2">
+      <span class="text-muted-st" style="font-size:0.8rem;">{{ brand.products.count }} product{{ brand.products.count|pluralize }}</span>
+      <a href="{% url 'tracker:brand_edit' brand.pk %}" class="btn btn-st-outline btn-sm-st">Edit</a>
+    </div>
+  </div>
+  {% if brand.brand_type == 'competitor' %}
+  <div class="st-card-body" style="border-bottom:1px solid var(--st-border);">
+    <div class="row g-2" style="font-size:0.85rem;">
+      <div class="col-md-3"><span class="text-muted-st" style="font-size:0.75rem;">Contact Person</span><br><strong>{{ brand.contact_person|default:"—" }}</strong></div>
+      <div class="col-md-3"><span class="text-muted-st" style="font-size:0.75rem;">Contact Phone</span><br><strong>{{ brand.contact_phone|default:"—" }}</strong></div>
+      <div class="col-md-2"><span class="text-muted-st" style="font-size:0.75rem;">Market Strength</span><br>{% if brand.market_strength %}<span class="st-badge {% if brand.market_strength == 'strong' %}danger{% elif brand.market_strength == 'moderate' %}pending{% else %}neutral{% endif %}">{{ brand.get_market_strength_display }}</span>{% else %}—{% endif %}</div>
+      <div class="col-md-4"><span class="text-muted-st" style="font-size:0.75rem;">Notes</span><br>{{ brand.notes|default:"—" }}</div>
+    </div>
+  </div>
+  {% endif %}
+  {% if brand.products.all %}
+  <div class="st-table-wrap">
+    <table class="table-st mb-0">
+      <thead><tr><th>Product</th><th>SKU</th><th>Category</th><th>Unit Price</th><th>Status</th></tr></thead>
+      <tbody>
+        {% for p in brand.products.all %}
+        <tr>
+          <td class="st-cell-title">{{ p.name }}</td>
+          <td>{{ p.sku|default:"—" }}</td>
+          <td>{{ p.category|default:"—" }}</td>
+          <td>₹{{ p.unit_price }}</td>
+          <td>{% if p.is_active %}<span class="st-badge active">Active</span>{% else %}<span class="st-badge inactive">Inactive</span>{% endif %}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="st-card-body"><p class="text-muted-st mb-0" style="font-size:0.85rem;">No products added under this brand yet.</p></div>
+  {% endif %}
+</div>
+{% empty %}
+<div class="st-card"><div class="st-empty-state"><p class="mb-0">No brands added yet. Start by adding your brands and competitor brands.</p></div></div>
+{% endfor %}
+{% endblock %}

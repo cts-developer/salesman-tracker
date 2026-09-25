@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block crumb %}Project Visits{% endblock %}
+{% block page_title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+    <div class="st-card">
+      <div class="st-card-body">
+        <form method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="row g-3">
+            <div class="col-md-8"><label class="st-form-label">Project Name *</label>{{ form.project_name }}</div>
+            <div class="col-md-4"><label class="st-form-label">Project Type</label>{{ form.project_type }}</div>
+            <div class="col-md-6"><label class="st-form-label">Area</label>{{ form.area }}</div>
+            <div class="col-md-6"><label class="st-form-label">Location</label>{{ form.location }}</div>
+            <div class="col-md-6"><label class="st-form-label">Contact Person</label>{{ form.contact_person }}</div>
+            <div class="col-md-6"><label class="st-form-label">Contact Phone</label>{{ form.contact_phone }}</div>
+            <div class="col-md-4"><label class="st-form-label">Stage</label>{{ form.stage }}</div>
+            <div class="col-md-4"><label class="st-form-label">Expected Business Value (₹)</label>{{ form.expected_business_value }}</div>
+            <div class="col-md-4"><label class="st-form-label">Visit Date *</label>{{ form.visit_date }}</div>
+            <div class="col-md-6"><label class="st-form-label">Expected Closure Date</label>{{ form.expected_closure_date }}</div>
+            <div class="col-md-6"><label class="st-form-label">Photo</label>{{ form.photo }}</div>
+            <div class="col-12"><label class="st-form-label">Notes</label>{{ form.notes }}</div>
+          </div>
+          <button type="submit" class="btn btn-st-primary mt-4">Save Project Visit</button>
+          <a href="{% url 'tracker:project_list' %}" class="btn btn-st-outline mt-4">Cancel</a>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

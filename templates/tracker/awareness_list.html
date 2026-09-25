@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Product Awareness{% endblock %}
+{% block crumb %}Sales Data{% endblock %}
+{% block page_title %}Product Awareness{% endblock %}
+{% block topbar_action %}<a href="{% url 'tracker:awareness_create' %}" class="btn btn-st-accent">+ Add Record</a>{% endblock %}
+
+{% block content %}
+<div class="st-card">
+  {% if page_obj %}
+  <div class="st-table-wrap">
+    <table class="table-st mb-0">
+      <thead><tr><th>Dealer / Counter</th><th>Product</th><th>Brand</th><th>In Stock</th><th>Display Quality</th><th>Recorded</th></tr></thead>
+      <tbody>
+        {% for a in page_obj %}
+        <tr>
+          <td class="st-cell-title">{{ a.dealer.name }}</td>
+          <td>{{ a.product.name }}</td>
+          <td>{{ a.product.brand.name }}</td>
+          <td>{% if a.is_in_stock %}<span class="st-badge active">In Stock</span>{% else %}<span class="st-badge danger">Out of Stock</span>{% endif %}</td>
+          <td>
+            {% if a.display_quality == "excellent" %}<span class="st-badge active">Excellent</span>
+            {% elif a.display_quality == "good" %}<span class="st-badge info">Good</span>
+            {% elif a.display_quality == "average" %}<span class="st-badge pending">Average</span>
+            {% else %}<span class="st-badge danger">Poor</span>{% endif %}
+          </td>
+          <td>{{ a.recorded_at|date:"d M, g:i A" }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="st-empty-state">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="4" width="16" height="16" rx="2"/></svg>
+    <p class="mb-0">No product awareness records yet.</p>
+  </div>
+  {% endif %}
+</div>
+{% include "tracker/_pagination.html" %}
+{% endblock %}

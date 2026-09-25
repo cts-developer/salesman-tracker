@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Notifications{% endblock %}
+{% block crumb %}Overview{% endblock %}
+{% block page_title %}Notifications{% endblock %}
+
+{% block content %}
+<div class="st-card">
+  {% if page_obj %}
+  <div class="st-table-wrap">
+    <table class="table-st mb-0">
+      <thead><tr><th>Title</th><th>Message</th><th>Received</th><th></th></tr></thead>
+      <tbody>
+        {% for n in page_obj %}
+        <tr>
+          <td class="st-cell-title">{{ n.title }}</td>
+          <td>{{ n.message }}</td>
+          <td>{{ n.created_at|date:"d M Y, g:i A" }}</td>
+          <td>{% if n.link_name %}<a href="{% url n.link_name %}" class="btn btn-st-outline btn-sm-st">Open</a>{% endif %}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="st-empty-state"><p class="mb-0">No notifications yet.</p></div>
+  {% endif %}
+</div>
+{% include "tracker/_pagination.html" %}
+{% endblock %}

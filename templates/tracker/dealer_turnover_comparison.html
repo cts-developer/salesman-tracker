@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% block title %}Turnover Comparison — {{ dealer.name }}{% endblock %}
+{% block crumb %}Dealers & Counters{% endblock %}
+{% block page_title %}In-house vs Competitor Turnover — {{ dealer.name }}{% endblock %}
+
+{% block content %}
+<div class="row g-3 mb-3">
+  <div class="col-6 col-md-4">
+    <div class="st-stat-card">
+      <div class="st-stat-value" style="color:var(--st-blue-600);">₹{{ overall.own|floatformat:0|intcomma }}</div>
+      <div class="st-stat-label">Our Products — Total Turnover</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-4">
+    <div class="st-stat-card">
+      <div class="st-stat-value" style="color:#b23b3b;">₹{{ overall.competitor|floatformat:0|intcomma }}</div>
+      <div class="st-stat-label">Competitor Products — Total Turnover</div>
+    </div>
+  </div>
+  <div class="col-12 col-md-4">
+    <div class="st-stat-card">
+      <div class="st-stat-value">₹{{ overall.total|floatformat:0|intcomma }}</div>
+      <div class="st-stat-label">Combined Turnover at this Dealer</div>
+    </div>
+  </div>
+</div>
+
+<div class="st-card mb-3">
+  <div class="st-card-header"><h3>Month-by-Month Comparison (last 6 months)</h3></div>
+  <div class="st-table-wrap">
+    <table class="table-st mb-0">
+      <thead><tr><th>Month</th><th>Our Turnover</th><th>Competitor Turnover</th><th>Difference</th></tr></thead>
+      <tbody>
+        {% for m in months %}
+        <tr>
+          <td class="st-cell-title">{{ m.label }}</td>
+          <td>₹{{ m.own|floatformat:0|intcomma }}</td>
+          <td>₹{{ m.competitor|floatformat:0|intcomma }}</td>
+          <td>
+            {% if m.diff > 0 %}<span class="st-badge active">▲ We lead by ₹{{ m.diff|floatformat:0|intcomma }}</span>
+            {% elif m.diff < 0 %}<span class="st-badge danger">▼ Behind by ₹{{ m.diff|floatformat:0|intcomma|slice:"1:" }}</span>
+            {% else %}<span class="st-badge neutral">Even</span>{% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="st-card">
+  <div class="st-card-header"><h3>Turnover by Brand</h3></div>
+  {% if by_brand %}
+  <div class="st-table-wrap">
+    <table class="table-st mb-0">
+      <thead><tr><th>Brand</th><th>Type</th><th>Total Turnover</th></tr></thead>
+      <tbody>
+        {% for b in by_brand %}
+        <tr>
+          <td class="st-cell-title">{{ b.brand__name }}</td>
+          <td>{% if b.brand__brand_type == 'own' %}<span class="st-badge info">Our Brand</span>{% else %}<span class="st-badge neutral">Competitor</span>{% endif %}</td>
+          <td>₹{{ b.total|floatformat:0|intcomma }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}<div class="st-empty-state"><p class="mb-0">No brand-tagged turnover recorded yet for this dealer.</p></div>{% endif %}
+</div>
+{% endblock %}
